@@ -70,7 +70,7 @@ class InternalAwsS3Service extends AbstractLifecycleComponent implements AwsS3Se
                 Strings.collectionToDelimitedString(clientsSettings.keySet(), ","));
         }
 
-        logger.debug("creating S3 client with client_name [{}], endpoint [{}]", clientName, clientSettings.endpoint);
+        logger.debug("creating S3 client with client_name [{}], endpoint [{}], region [{}]", clientName, clientSettings.endpoint, clientSettings.region);
 
         AWSCredentialsProvider credentials = buildCredentials(logger, deprecationLogger, clientSettings, repositorySettings);
         ClientConfiguration configuration = buildConfiguration(clientSettings);
@@ -78,7 +78,11 @@ class InternalAwsS3Service extends AbstractLifecycleComponent implements AwsS3Se
         client = new AmazonS3Client(credentials, configuration);
 
         if (Strings.hasText(clientSettings.endpoint)) {
-            client.setEndpoint(clientSettings.endpoint);
+            if (Strings.hasText(clientSettings.region)) {
+                client.setEndpoint(clientSettings.endpoint, AmazonS3Client.S3_SERVICE_NAME, clientSettings.region);
+            } else {
+                client.setEndpoint(clientSettings.endpoint);
+            }
         }
 
         clientsCache.put(clientName, client);
