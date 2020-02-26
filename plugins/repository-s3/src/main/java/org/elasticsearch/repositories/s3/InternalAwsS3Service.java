@@ -32,6 +32,8 @@ import com.amazonaws.http.IdleConnectionReaper;
 import com.amazonaws.internal.StaticCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.S3ClientOptions;
+
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.Strings;
@@ -76,6 +78,10 @@ class InternalAwsS3Service extends AbstractLifecycleComponent implements AwsS3Se
         ClientConfiguration configuration = buildConfiguration(clientSettings);
 
         client = new AmazonS3Client(credentials, configuration);
+
+        if (clientSettings.pathStyleAccess) {
+            client.setS3ClientOptions(S3ClientOptions.builder().setPathStyleAccess(true).build());
+        }
 
         if (Strings.hasText(clientSettings.endpoint)) {
             if (Strings.hasText(clientSettings.region)) {

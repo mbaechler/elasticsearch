@@ -55,6 +55,10 @@ class S3ClientSettings {
     static final Setting.AffixSetting<String> ENDPOINT_SETTING = Setting.affixKeySetting(PREFIX, "endpoint",
         key -> new Setting<>(key, "", s -> s.toLowerCase(Locale.ROOT), Property.NodeScope));
 
+    /** An override for the s3 endpoint to connect to. */
+    static final Setting.AffixSetting<Boolean> PATH_STYLE_ACCESS_SETTING = Setting.affixKeySetting(PREFIX, "path_style_access",
+        key -> Setting.boolSetting(key, false, Property.NodeScope));
+
     /** An override for the s3 region to connect to s3. */
     static final Setting.AffixSetting<String> REGION_SETTING = Setting.affixKeySetting(PREFIX, "region",
         key -> Setting.simpleString(key, Property.NodeScope));
@@ -100,6 +104,9 @@ class S3ClientSettings {
     /** The s3 region the client should talk to, or empty string to use the default. */
     final String region;
 
+    /** Whether to use bucket name as a part of the path or as part of the hostname. */
+    final boolean pathStyleAccess;
+
     /** The protocol to use to talk to s3. Defaults to https. */
     final Protocol protocol;
 
@@ -126,12 +133,13 @@ class S3ClientSettings {
     /** Whether the s3 client should use an exponential backoff retry policy. */
     final boolean throttleRetries;
 
-    private S3ClientSettings(BasicAWSCredentials credentials, String endpoint, String region, Protocol protocol,
+    private S3ClientSettings(BasicAWSCredentials credentials, String endpoint, String region, boolean pathStyleAccess, Protocol protocol,
                              String proxyHost, int proxyPort, String proxyUsername, String proxyPassword,
                              int readTimeoutMillis, int maxRetries, boolean throttleRetries) {
         this.credentials = credentials;
         this.endpoint = endpoint;
         this.region = region;
+        this.pathStyleAccess = pathStyleAccess;
         this.protocol = protocol;
         this.proxyHost = proxyHost;
         this.proxyPort = proxyPort;
@@ -182,6 +190,7 @@ class S3ClientSettings {
                 credentials,
                 getConfigValue(settings, clientName, ENDPOINT_SETTING),
                 getConfigValue(settings, clientName, REGION_SETTING),
+                getConfigValue(settings, clientName, PATH_STYLE_ACCESS_SETTING),
                 getConfigValue(settings, clientName, PROTOCOL_SETTING),
                 getConfigValue(settings, clientName, PROXY_HOST_SETTING),
                 getConfigValue(settings, clientName, PROXY_PORT_SETTING),

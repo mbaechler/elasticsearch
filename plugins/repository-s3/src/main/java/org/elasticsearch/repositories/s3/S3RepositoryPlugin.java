@@ -84,6 +84,7 @@ public class S3RepositoryPlugin extends Plugin implements RepositoryPlugin {
             S3ClientSettings.SECRET_KEY_SETTING,
             S3ClientSettings.ENDPOINT_SETTING,
             S3ClientSettings.REGION_SETTING,
+            S3ClientSettings.PATH_STYLE_ACCESS_SETTING,
             S3ClientSettings.PROTOCOL_SETTING,
             S3ClientSettings.PROXY_HOST_SETTING,
             S3ClientSettings.PROXY_PORT_SETTING,
